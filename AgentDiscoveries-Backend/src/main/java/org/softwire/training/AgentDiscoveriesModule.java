@@ -6,11 +6,15 @@ import org.apache.commons.configuration2.Configuration;
 import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 @Module(injects = AgentDiscoveriesApplication.class)
 public class AgentDiscoveriesModule {
 
     private final Configuration config;
     private final Jdbi jdbi;
+    private final EntityManagerFactory entityManagerFactory;
 
     public AgentDiscoveriesModule(Configuration config) {
         this.config = config;
@@ -18,6 +22,7 @@ public class AgentDiscoveriesModule {
                 config.getString("database.url"),
                 config.getString("database.username"),
                 config.getString("database.password"));
+        entityManagerFactory = Persistence.createEntityManagerFactory("org.softwire.training.jpa");
     }
 
     @Provides
@@ -40,4 +45,7 @@ public class AgentDiscoveriesModule {
     public Jdbi providesJdbi() {
         return jdbi;
     }
+
+    @Provides
+    public EntityManagerFactory providesEntityManagerFactory() { return entityManagerFactory; }
 }

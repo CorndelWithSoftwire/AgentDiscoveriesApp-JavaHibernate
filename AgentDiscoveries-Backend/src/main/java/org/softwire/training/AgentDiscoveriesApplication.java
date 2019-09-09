@@ -20,11 +20,11 @@ import spark.ResponseTransformer;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static spark.Spark.*;
+
 
 public class AgentDiscoveriesApplication implements Runnable {
 
