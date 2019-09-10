@@ -1,64 +1,77 @@
 package org.softwire.training.db.daos;
 
-import org.jdbi.v3.core.Handle;
-import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.statement.Query;
 import org.softwire.training.db.daos.searchcriteria.ReportSearchCriterion;
 import org.softwire.training.models.RegionSummaryReport;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class RegionSummaryReportsDao implements ReportsDao<RegionSummaryReport> {
 
-    @Inject
-    Jdbi jdbi;
+    @Inject EntityManagerFactory entityManagerFactory;
 
     public Optional<RegionSummaryReport> getReport(int reportId) {
-        try (Handle handle = jdbi.open()) {
-            return handle.createQuery("SELECT * FROM region_summary_reports WHERE report_id = :report_id")
-                    .bind("report_id", reportId)
-                    .mapToBean(RegionSummaryReport.class)
-                    .findFirst();
-        }
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        RegionSummaryReport report = em.find(RegionSummaryReport.class, reportId);
+
+        em.getTransaction().commit();
+        em.close();
+
+        return Optional.ofNullable(report);
     }
 
     public int createReport(RegionSummaryReport report) {
-        try (Handle handle = jdbi.open()) {
-            return handle.createScript("INSERT INTO region_summary_reports (region_id, agent_id, status, report_time, report_body)" +
-                    " VALUES ("
-                    + report.getRegionId() + ", "
-                    + report.getAgentId() + ", "
-                    + report.getStatus() + ", '"
-                    + report.getReportTime() + "', '"
-                    + report.getReportBody()
-                    +"')").execute()[0];
-        }
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        em.persist(report);
+        em.flush();
+
+        em.getTransaction().commit();
+        em.close();
+
+        return report.getReportId();
     }
 
     public void deleteReport(int report_id) {
-        try (Handle handle = jdbi.open()) {
-            handle.createUpdate("DELETE FROM region_summary_reports WHERE report_id = :report_id")
-                    .bind("report_id", report_id)
-                    .execute();
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        RegionSummaryReport report = em.find(RegionSummaryReport.class, report_id);
+        if (report != null) {
+            em.remove(report);
         }
+
+        em.getTransaction().commit();
+        em.close();
     }
 
     public List<RegionSummaryReport> searchReports(List<ReportSearchCriterion> searchCriteria) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
         String whereClause = ReportsDaoUtils.buildWhereSubClauseFromCriteria(searchCriteria);
 
-        try (Handle handle = jdbi.open()) {
-             Query query = handle.createQuery("SELECT * FROM region_summary_reports " + whereClause);
+        TypedQuery<RegionSummaryReport> query = em.createQuery("FROM region_summary_reports " + whereClause, RegionSummaryReport.class);
 
-             for (ReportSearchCriterion criterion : searchCriteria) {
-                 for (Map.Entry<String, Object> bindingEntry : criterion.getBindingsForSql().entrySet()) {
-                     query.bind(bindingEntry.getKey(), bindingEntry.getValue());
-                 }
-             }
-
-             return query.mapToBean(RegionSummaryReport.class).list();
+        for (ReportSearchCriterion criterion : searchCriteria) {
+            for (Map.Entry<String, Object> bindingEntry : criterion.getBindingsForSql().entrySet()) {
+                query = query.setParameter(bindingEntry.getKey(), bindingEntry.getValue());
+            }
         }
+
+        List<RegionSummaryReport> results = query.getResultList();
+
+        em.getTransaction().commit();
+        em.close();
+
+        return results;
     }
 }
