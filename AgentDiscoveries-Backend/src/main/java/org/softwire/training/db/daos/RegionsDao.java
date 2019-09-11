@@ -1,59 +1,74 @@
 package org.softwire.training.db.daos;
 
-import org.jdbi.v3.core.Handle;
-import org.jdbi.v3.core.Jdbi;
 import org.softwire.training.models.Region;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import java.util.List;
 import java.util.Optional;
 
 public class RegionsDao {
 
-    @Inject
-    Jdbi jdbi;
+    @Inject EntityManagerFactory entityManagerFactory;
 
     public Optional<Region> getRegion(int regionId) {
-        try (Handle handle = jdbi.open()) {
-            return handle.createQuery("SELECT * FROM regions WHERE region_id = :region_id")
-                    .bind("region_id", regionId)
-                    .mapToBean(Region.class)
-                    .findFirst();
-        }
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        Region region = em.find(Region.class, regionId);
+
+        em.getTransaction().commit();
+        em.close();
+
+        return Optional.ofNullable(region);
     }
 
     public List<Region> getRegions() {
-        try (Handle handle = jdbi.open()) {
-            return handle.createQuery("SELECT * FROM regions")
-                    .mapToBean(Region.class)
-                    .list();
-        }
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        List<Region> results = em.createQuery("FROM regions", Region.class).getResultList();
+
+        em.getTransaction().commit();
+        em.close();
+
+        return results;
     }
 
     public int createRegion(Region region) {
-        try (Handle handle = jdbi.open()) {
-            return handle.createUpdate("INSERT INTO regions (name) VALUE (:name)")
-                    .bind("name", region.getName())
-                    .executeAndReturnGeneratedKeys("region_id")
-                    .mapTo(Integer.class)
-                    .findOnly();
-        }
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        em.persist(region);
+        em.flush();
+
+        em.getTransaction().commit();
+        em.close();
+
+        return region.getRegionId();
     }
 
     public void updateRegion(Region region) {
-        try (Handle handle = jdbi.open()) {
-            handle.createUpdate("UPDATE regions SET name = :name WHERE region_id = :region_id")
-                    .bind("name", region.getName())
-                    .bind("region_id", region.getRegionId())
-                    .execute();
-        }
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        em.merge(region);
+
+        em.getTransaction().commit();
+        em.close();
     }
 
     public void deleteRegion(int regionId) {
-        try (Handle handle = jdbi.open()) {
-            handle.createUpdate("DELETE FROM regions WHERE region_id = :region_id")
-                    .bind("region_id", regionId)
-                    .execute();
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        Region region = em.find(Region.class, regionId);
+        if (region != null) {
+            em.remove(region);
         }
+
+        em.getTransaction().commit();
+        em.close();
     }
 }
