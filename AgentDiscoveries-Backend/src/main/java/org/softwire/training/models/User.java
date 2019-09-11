@@ -1,9 +1,6 @@
 package org.softwire.training.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -25,7 +22,8 @@ public class User {
     }
 
     @Id
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public int getUserId() {
         return userId;
     }
@@ -34,7 +32,7 @@ public class User {
         this.userId = userId;
     }
 
-    @Column(name = "username", unique = true)
+    @Column(name = "username", unique = true, nullable = false)
     public String getUsername() {
         return username;
     }
@@ -43,7 +41,7 @@ public class User {
         this.username = username;
     }
 
-    @Column(name = "hashed_password")
+    @Column(name = "hashed_password", nullable = false)
     public String getHashedPassword() {
         return hashedPassword;
     }
@@ -61,8 +59,10 @@ public class User {
         this.agentId = agentId;
     }
 
-    @Column(name = "admin")
-    public boolean isAdmin(){return admin;}
+    @Column(name = "admin", nullable = false)
+    public boolean isAdmin(){
+        return admin;
+    }
 
     public void setAdmin(boolean admin){this.admin=admin;}
 }

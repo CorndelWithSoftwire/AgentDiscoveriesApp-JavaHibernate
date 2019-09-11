@@ -10,7 +10,7 @@ public class LocationStatusReport extends ReportBase {
 
     private int locationId;
 
-    @Column(name = "location_id")
+    @Column(name = "location_id", nullable = false)
     public int getLocationId() {
         return locationId;
     }

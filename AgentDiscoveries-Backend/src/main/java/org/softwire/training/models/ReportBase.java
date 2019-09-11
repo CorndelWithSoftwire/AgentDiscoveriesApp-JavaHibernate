@@ -13,7 +13,8 @@ public class ReportBase {
     private int agentId;
 
     @Id
-    @Column(name = "report_id")
+    @Column(name = "report_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public int getReportId() {
         return reportId;
     }
@@ -22,7 +23,7 @@ public class ReportBase {
         this.reportId = reportId;
     }
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     public byte getStatus() {
         return status;
     }
@@ -32,7 +33,7 @@ public class ReportBase {
     }
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "report_time")
+    @Column(name = "report_time", nullable = false)
     public LocalDateTime getReportTime() {
         return reportTime;
     }
@@ -41,7 +42,7 @@ public class ReportBase {
         this.reportTime = reportTime;
     }
 
-    @Column(name = "report_body")
+    @Column(name = "report_body", columnDefinition = "mediumtext", nullable = false)
     public String getReportBody() {
         return reportBody;
     }
@@ -50,7 +51,7 @@ public class ReportBase {
         this.reportBody = reportBody;
     }
 
-    @Column(name = "agent_id")
+    @Column(name = "agent_id", nullable = false)
     public int getAgentId() { return agentId; }
 
     public void setAgentId(int agentId) { this.agentId = agentId; }

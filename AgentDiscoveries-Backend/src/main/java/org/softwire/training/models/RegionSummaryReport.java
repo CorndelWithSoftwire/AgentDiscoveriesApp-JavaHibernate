@@ -10,7 +10,7 @@ public class RegionSummaryReport extends ReportBase {
 
     private int regionId;
 
-    @Column(name = "region_id")
+    @Column(name = "region_id", nullable = false)
     public int getRegionId() {
         return regionId;
     }
