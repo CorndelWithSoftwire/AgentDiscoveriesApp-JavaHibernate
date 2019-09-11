@@ -3,72 +3,37 @@ package org.softwire.training.db.daos;
 import org.softwire.training.models.Agent;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 import java.util.Optional;
 
 public class AgentsDao {
 
-    @Inject EntityManagerFactory entityManagerFactory;
+    private DaoHelper<Agent> helper;
+
+    @Inject
+    public AgentsDao(EntityManagerFactory entityManagerFactory) {
+        this.helper = new DaoHelper<>(entityManagerFactory);
+    }
 
     public Optional<Agent> getAgent(int agentId) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        Agent agent = em.find(Agent.class, agentId);
-
-        em.getTransaction().commit();
-        em.close();
-
-        return Optional.ofNullable(agent);
+        return helper.getEntity(Agent.class, agentId);
     }
 
     public List<Agent> getAgents() {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        List<Agent> results = em.createQuery("FROM Agent", Agent.class).getResultList();
-
-        em.getTransaction().commit();
-        em.close();
-
-        return results;
+        return helper.getEntities(Agent.class);
     }
 
     public int createAgent(Agent agent) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        em.persist(agent);
-        em.flush();
-
-        em.getTransaction().commit();
-        em.close();
-
+        helper.createEntity(agent);
         return agent.getAgentId();
     }
 
     public void deleteAgent(int agentId) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        Agent agent = em.find(Agent.class, agentId);
-        if (agent != null) {
-            em.remove(agent);
-        }
-
-        em.getTransaction().commit();
-        em.close();
+        helper.deleteEntity(Agent.class, agentId);
     }
 
     public void updateAgent(Agent agent) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        em.merge(agent);
-
-        em.getTransaction().commit();
-        em.close();
+        helper.updateEntity(agent);
     }
 }

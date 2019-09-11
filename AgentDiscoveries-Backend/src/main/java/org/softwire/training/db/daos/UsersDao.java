@@ -10,7 +10,14 @@ import java.util.Optional;
 
 public class UsersDao {
 
-    @Inject EntityManagerFactory entityManagerFactory;
+    private EntityManagerFactory entityManagerFactory;
+    private DaoHelper<User> helper;
+
+    @Inject
+    public UsersDao(EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
+        this.helper = new DaoHelper<>(entityManagerFactory);
+    }
 
     public Optional<User> getUserByUsername(String username) {
         EntityManager em = entityManagerFactory.createEntityManager();
@@ -29,62 +36,23 @@ public class UsersDao {
     }
 
     public Optional<User> getUser(int userId) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        User user = em.find(User.class, userId);
-
-        em.getTransaction().commit();
-        em.close();
-
-        return Optional.ofNullable(user);
+        return helper.getEntity(User.class, userId);
     }
 
     public List<User> getUsers() {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        List<User> results = em.createQuery("FROM User", User.class).getResultList();
-
-        em.getTransaction().commit();
-        em.close();
-
-        return results;
+        return helper.getEntities(User.class);
     }
 
     public int addUser(User user) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        em.persist(user);
-        em.flush();
-
-        em.getTransaction().commit();
-        em.close();
-
+        helper.createEntity(user);
         return user.getUserId();
     }
 
     public void deleteUser(int userId) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        User user = em.find(User.class, userId);
-        if (user != null) {
-            em.remove(user);
-        }
-
-        em.getTransaction().commit();
-        em.close();
+        helper.deleteEntity(User.class, userId);
     }
 
     public void updateUser(User user) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        em.merge(user);
-
-        em.getTransaction().commit();
-        em.close();
+        helper.updateEntity(user);
     }
 }

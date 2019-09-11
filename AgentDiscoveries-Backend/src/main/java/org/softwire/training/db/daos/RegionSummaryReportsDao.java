@@ -13,44 +13,26 @@ import java.util.Optional;
 
 public class RegionSummaryReportsDao implements ReportsDao<RegionSummaryReport> {
 
-    @Inject EntityManagerFactory entityManagerFactory;
+    private EntityManagerFactory entityManagerFactory;
+    private DaoHelper<RegionSummaryReport> helper;
+
+    @Inject
+    public RegionSummaryReportsDao(EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
+        this.helper = new DaoHelper<>(entityManagerFactory);
+    }
 
     public Optional<RegionSummaryReport> getReport(int reportId) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        RegionSummaryReport report = em.find(RegionSummaryReport.class, reportId);
-
-        em.getTransaction().commit();
-        em.close();
-
-        return Optional.ofNullable(report);
+        return helper.getEntity(RegionSummaryReport.class, reportId);
     }
 
     public int createReport(RegionSummaryReport report) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        em.persist(report);
-        em.flush();
-
-        em.getTransaction().commit();
-        em.close();
-
+        helper.createEntity(report);
         return report.getReportId();
     }
 
-    public void deleteReport(int report_id) {
-        EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-
-        RegionSummaryReport report = em.find(RegionSummaryReport.class, report_id);
-        if (report != null) {
-            em.remove(report);
-        }
-
-        em.getTransaction().commit();
-        em.close();
+    public void deleteReport(int reportId) {
+        helper.deleteEntity(RegionSummaryReport.class, reportId);
     }
 
     public List<RegionSummaryReport> searchReports(List<ReportSearchCriterion> searchCriteria) {
