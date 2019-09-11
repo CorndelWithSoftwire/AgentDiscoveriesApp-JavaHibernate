@@ -14,7 +14,7 @@ public class ReportBase {
 
     @Id
     @Column(name = "report_id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int getReportId() {
         return reportId;
     }
@@ -32,7 +32,7 @@ public class ReportBase {
         this.status = status;
     }
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Convert(converter = LocalDateTimeAttributeConverter.class)
     @Column(name = "report_time", nullable = false)
     public LocalDateTime getReportTime() {
         return reportTime;

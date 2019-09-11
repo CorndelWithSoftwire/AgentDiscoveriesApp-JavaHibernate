@@ -59,7 +59,7 @@ public class RegionSummaryReportsDao implements ReportsDao<RegionSummaryReport> 
 
         String whereClause = ReportsDaoUtils.buildWhereSubClauseFromCriteria(searchCriteria);
 
-        TypedQuery<RegionSummaryReport> query = em.createQuery("FROM region_summary_reports " + whereClause, RegionSummaryReport.class);
+        TypedQuery<RegionSummaryReport> query = em.createQuery("FROM RegionSummaryReport " + whereClause, RegionSummaryReport.class);
 
         for (ReportSearchCriterion criterion : searchCriteria) {
             for (Map.Entry<String, Object> bindingEntry : criterion.getBindingsForSql().entrySet()) {

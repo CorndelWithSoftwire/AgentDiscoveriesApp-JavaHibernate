@@ -28,7 +28,7 @@ public class RegionsDao {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
 
-        List<Region> results = em.createQuery("FROM regions", Region.class).getResultList();
+        List<Region> results = em.createQuery("FROM Region", Region.class).getResultList();
 
         em.getTransaction().commit();
         em.close();

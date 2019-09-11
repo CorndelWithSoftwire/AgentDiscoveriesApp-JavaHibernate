@@ -1,68 +1,74 @@
 package org.softwire.training.db.daos;
 
-import org.jdbi.v3.core.Handle;
-import org.jdbi.v3.core.Jdbi;
 import org.softwire.training.models.Location;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import java.util.List;
 import java.util.Optional;
 
 public class LocationsDao {
 
-    @Inject
-    Jdbi jdbi;
+    @Inject EntityManagerFactory entityManagerFactory;
 
     public Optional<Location> getLocation(int locationId) {
-        try (Handle handle = jdbi.open()) {
-            return handle.createQuery("SELECT * FROM locations WHERE location_id = :location_id")
-                    .bind("location_id", locationId)
-                    .mapToBean(Location.class)
-                    .findFirst();
-        }
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        Location location = em.find(Location.class, locationId);
+
+        em.getTransaction().commit();
+        em.close();
+
+        return Optional.ofNullable(location);
     }
 
     public List<Location> getLocations() {
-        try (Handle handle = jdbi.open()) {
-            return handle.createQuery("SELECT * FROM locations")
-                    .mapToBean(Location.class)
-                    .list();
-        }
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        List<Location> results = em.createQuery("FROM Location", Location.class).getResultList();
+
+        em.getTransaction().commit();
+        em.close();
+
+        return results;
     }
 
     public int createLocation(Location location) {
-        try (Handle handle = jdbi.open()) {
-            return handle.createUpdate("INSERT INTO locations (location, site_name, time_zone, region_id) " +
-                    "VALUES (:location, :site_name, :time_zone, :region_id)")
-                    .bind("location", location.getLocation())
-                    .bind("site_name", location.getSiteName())
-                    .bind("time_zone", location.getTimeZone())
-                    .bind("region_id", location.getRegionId())
-                    .executeAndReturnGeneratedKeys("location_id")
-                    .mapTo(Integer.class)
-                    .findOnly();
-        }
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        em.persist(location);
+        em.flush();
+
+        em.getTransaction().commit();
+        em.close();
+
+        return location.getLocationId();
     }
 
     public void deleteLocation(int locationId) {
-        try (Handle handle = jdbi.open()) {
-            handle.createUpdate("DELETE FROM locations WHERE location_id = :location_id")
-                    .bind("location_id", locationId)
-                    .execute();
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        Location location = em.find(Location.class, locationId);
+        if (location != null) {
+            em.remove(location);
         }
+
+        em.getTransaction().commit();
+        em.close();
     }
 
     public void updateLocation(Location location) {
-        try (Handle handle = jdbi.open()) {
-            handle.createUpdate("UPDATE locations SET location = :location, site_name = :site_name, " +
-                    "time_zone = :time_zone, region_id = :region_id WHERE location_id = :location_id")
-                    .bind("location_id", location.getLocationId())
-                    .bind("location", location.getLocation())
-                    .bind("site_name", location.getSiteName())
-                    .bind("time_zone", location.getTimeZone())
-                    .bind("region_id", location.getRegionId())
-                    .execute();
-        }
+        EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+
+        em.merge(location);
+
+        em.getTransaction().commit();
+        em.close();
     }
 }

@@ -73,11 +73,6 @@
     <orderEntry type="library" name="Maven: com.squareup:javapoet:1.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.flywaydb:flyway-core:5.0.6" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.2" level="project" />
-    <orderEntry type="library" name="Maven: org.jdbi:jdbi3-core:3.0.1" level="project" />
-    <orderEntry type="library" name="Maven: org.antlr:antlr-runtime:3.4" level="project" />
-    <orderEntry type="library" name="Maven: org.antlr:stringtemplate:3.2.1" level="project" />
-    <orderEntry type="library" name="Maven: net.jodah:expiringmap:0.5.6" level="project" />
-    <orderEntry type="library" name="Maven: org.jdbi:jdbi3-sqlobject:3.0.1" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.46" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-configuration2:2.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.6" level="project" />
