@@ -16,7 +16,7 @@ public class UsersDao {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
 
-        List<User> results = em.createQuery( "FROM User WHERE username LIKE :username", User.class).setParameter("username", username).getResultList();
+        List<User> results = em.createQuery("FROM users WHERE username LIKE :username", User.class).setParameter("username", username).getResultList();
 
         em.getTransaction().commit();
         em.close();
@@ -44,7 +44,7 @@ public class UsersDao {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
 
-        List<User> results = em.createQuery( "FROM User", User.class).getResultList();
+        List<User> results = em.createQuery("FROM users", User.class).getResultList();
 
         em.getTransaction().commit();
         em.close();
