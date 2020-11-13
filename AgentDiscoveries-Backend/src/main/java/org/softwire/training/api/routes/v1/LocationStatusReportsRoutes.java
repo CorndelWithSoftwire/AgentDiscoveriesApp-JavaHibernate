@@ -37,9 +37,15 @@ public class LocationStatusReportsRoutes extends ReportsRoutesBase<LocationStatu
                 permissionsVerifier);
         this.locationsDao = locationsDao;
     }
+    int a = 1000;
+    int b = 0;
 
     @Override
     protected LocationStatusReport validateThenMap(LocationStatusReportApiModel apiModel) {
+        if (apiModel.getStatus() > a || apiModel.getStatus() < b) {
+            throw new FailedRequestException(ErrorCode.INVALID_INPUT, "Location status must be between 0 and 1000");
+        }
+
         // Ignore any supplied report time
         LocalDateTime reportTimeUtc = LocalDateTime.now(ZoneOffset.UTC);
 
@@ -48,6 +54,7 @@ public class LocationStatusReportsRoutes extends ReportsRoutesBase<LocationStatu
         model.setLocationId(apiModel.getLocationId());
         model.setStatus(apiModel.getStatus());
         model.setReportTime(reportTimeUtc);
+        model.setReportTitle(apiModel.getReportTitle());
         model.setReportBody(apiModel.getReportBody());
 
         return model;
@@ -73,6 +80,7 @@ public class LocationStatusReportsRoutes extends ReportsRoutesBase<LocationStatu
         apiModel.setLocationId(model.getLocationId());
         apiModel.setStatus(model.getStatus());
         apiModel.setReportTime(model.getReportTime().atZone(locationTimeZone));
+        apiModel.setReportTitle(model.getReportTitle());
         apiModel.setReportBody(model.getReportBody());
 
         return apiModel;
@@ -83,12 +91,16 @@ public class LocationStatusReportsRoutes extends ReportsRoutesBase<LocationStatu
         QueryParamsMap queryMap = req.queryMap();
         List<ReportSearchCriterion> searchCriteria = new ArrayList<>();
 
-        if (!isNullOrEmpty(queryMap.get("callSign").value())) {
-            searchCriteria.add(new AgentCallSignSearchCriterion(queryMap.get("callSign").value()));
+        if (!isNullOrEmpty(queryMap.get("agentId").value())) {
+            searchCriteria.add(new AgentCallSignSearchCriterion(queryMap.get("agentId").integerValue()));
         }
 
         if (!isNullOrEmpty(queryMap.get("locationId").value())) {
             searchCriteria.add(new LocationIdSearchCriterion(queryMap.get("locationId").integerValue()));
+        }
+
+        if (!isNullOrEmpty(queryMap.get("reportTitle").value())) {
+            searchCriteria.add(new ReportTitleSearchCriterion(queryMap.get("reportTitle").value()));
         }
 
         if (!isNullOrEmpty(queryMap.get("fromTime").value())) {

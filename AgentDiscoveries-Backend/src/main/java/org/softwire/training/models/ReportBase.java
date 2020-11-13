@@ -1,13 +1,16 @@
 package org.softwire.training.models;
 
+import lombok.ToString;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@ToString
 @MappedSuperclass
 public class ReportBase {
 
     private int reportId;
-    private byte status;
+    private int status;
     private LocalDateTime reportTime; // Always UTC in the DB
     private String reportBody;
     private int agentId;
@@ -24,11 +27,11 @@ public class ReportBase {
     }
 
     @Column(name = "status", nullable = false)
-    public byte getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(byte status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

@@ -64,7 +64,8 @@ export default class RegionSummarySubmit extends React.Component {
                             placeholder='Write region summary'
                             value={this.state.reportBody}
                             onChange={this.onReportBodyChange}
-                            id="report-input"/>
+                            id="report-input"
+                            className="no-resize"/>
                     </FormGroup>
                     <Button type='submit' id="submit-report">Submit</Button>
                 </Form>
@@ -95,7 +96,10 @@ export default class RegionSummarySubmit extends React.Component {
 
         apiPost('reports/regionsummaries', body)
             .then(() => this.addMessage('Report submitted', 'info'))
+            .then(() => window.location.hash='#/success-message')
             .catch(() => this.addMessage('Error submitting report, please try again later', 'danger'));
+
+        document.getElementById('submit-report').disabled = true;
     }
 
     addMessage(message, type) {

@@ -1,6 +1,6 @@
 package org.softwire.training.api.integration.helper;
 
-import io.github.bonigarcia.wdm.ChromeDriverManager;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -15,7 +15,7 @@ public class WebDriverHelper {
     /**
      * Set this to 'false' to disable headless mode and allow debugging with developer tools.
      */
-    private static final boolean HEADLESS = true;
+    private static final boolean HEADLESS = false;
 
     /**
      * Shared webdriver
@@ -35,7 +35,7 @@ public class WebDriverHelper {
     }
 
     private static WebDriver prepareDriver() {
-        ChromeDriverManager.getInstance().setup();
+        WebDriverManager.chromedriver().setup();
 
         ChromeOptions options = new ChromeOptions();
         if (HEADLESS) {

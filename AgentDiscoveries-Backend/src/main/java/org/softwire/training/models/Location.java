@@ -1,7 +1,10 @@
 package org.softwire.training.models;
 
+import lombok.ToString;
+
 import javax.persistence.*;
 
+@ToString
 @Entity
 @Table(name = "locations")
 public class Location {
@@ -10,6 +13,8 @@ public class Location {
     private String siteName;
     private String location;
     private String timeZone;
+    private Float latitude;
+    private Float longitude;
     private Integer regionId; // Nullable
 
     @Id
@@ -22,6 +27,16 @@ public class Location {
     public void setLocationId(int locationId) {
         this.locationId = locationId;
     }
+
+    @Column(name = "latitude")
+    public Float getLatitude() { return latitude; }
+
+    public void setLatitude(Float latitude) { this.latitude = latitude; }
+
+    @Column(name = "longitude")
+    public Float getLongitude() { return longitude; }
+
+    public void setLongitude(Float longitude) { this.longitude = longitude; }
 
     @Column(name = "site_name", length = 20, nullable = false)
     public String getSiteName() {

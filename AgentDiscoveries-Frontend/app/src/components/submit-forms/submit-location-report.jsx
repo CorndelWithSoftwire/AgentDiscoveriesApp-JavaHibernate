@@ -13,6 +13,7 @@ export default class LocationReportSubmit extends React.Component {
 
             locationId: '',
             status: '',
+            reportTitle: '',
             reportBody: '',
             sendExternal: false,
 
@@ -21,6 +22,7 @@ export default class LocationReportSubmit extends React.Component {
 
         this.onLocationChange = this.onLocationChange.bind(this);
         this.onStatusChange = this.onStatusChange.bind(this);
+        this.onReportTitleChange = this.onReportTitleChange.bind(this);
         this.onReportBodyChange = this.onReportBodyChange.bind(this);
         this.onExternalChange = this.onExternalChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -57,7 +59,19 @@ export default class LocationReportSubmit extends React.Component {
                             placeholder='Enter numeric status code'
                             value={this.state.status}
                             onChange={this.onStatusChange}
-                            id="status-input"/>
+                            id="status-input"
+                            min="0"
+                            max="1000"/>
+                    </FormGroup>
+                    <FormGroup>
+                        <ControlLabel>Report Title</ControlLabel>
+                        <FormControl type='text' required
+                            componentClass='textarea' rows={1}
+                            placeholder='Enter report title'
+                            value={this.state.reportTitle}
+                            onChange={this.onReportTitleChange}
+                            id="title-input"
+                            className="no-resize"/>
                     </FormGroup>
                     <FormGroup>
                         <ControlLabel>Report</ControlLabel>
@@ -66,7 +80,8 @@ export default class LocationReportSubmit extends React.Component {
                             placeholder='Write report'
                             value={this.state.reportBody}
                             onChange={this.onReportBodyChange}
-                            id="report-input"/>
+                            id="report-input"
+                            className="no-resize"/>
                     </FormGroup>
                     <FormGroup>
                         <Checkbox type='checkbox'
@@ -89,6 +104,10 @@ export default class LocationReportSubmit extends React.Component {
         this.setState({ status: event.target.value && parseInt(event.target.value) });
     }
 
+    onReportTitleChange(event) {
+        this.setState({ reportTitle: event.target.value });
+    }
+
     onReportBodyChange(event) {
         this.setState({ reportBody: event.target.value });
     }
@@ -99,26 +118,32 @@ export default class LocationReportSubmit extends React.Component {
 
     onSubmit(event) {
         event.preventDefault();
-
         this.setState({ messages: [] });
+
 
         const body = {
             locationId: this.state.locationId,
             status: this.state.status,
+            reportTitle: this.state.reportTitle,
             reportBody: this.state.reportBody,
             sendExternal: this.state.sendExternal
         };
 
         apiPost('reports/locationstatuses', body)
             .then(() => this.addMessage('Report submitted', 'info'))
+            .then(() => window.location.hash='#/success-message')
             .catch(() => this.addMessage('Error submitting report, please try again later', 'danger'));
+
+        document.getElementById('submit-report').disabled = true;
 
         if (this.state.sendExternal) {
             apiPost('external/reports', body)
                 .then(() => this.addMessage('Report submitted to external partner', 'info'))
+                .then(() => window.location.hash='#/success-message')
                 .catch(() => this.addMessage('Error submitting report externally, please try again later', 'danger'));
         }
     }
+
 
     addMessage(message, type) {
         this.setState(oldState => {
